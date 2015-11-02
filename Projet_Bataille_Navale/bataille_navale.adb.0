@@ -1,0 +1,793 @@
+WITH Ada.Text_IO;
+USE Ada.Text_IO;
+WITH Ada.Integer_Text_IO;
+USE Ada.Integer_Text_IO;
+WITH Ada.Float_Text_IO;
+USE Ada.Float_Text_IO;
+WITH Ada.Numerics.Discrete_Random;
+
+
+PROCEDURE Bataille_Navale IS
+   --Jeu de la bataille navale
+  
+   
+   
+   TYPE Tbat IS ARRAY (1..5) OF String (1..18);
+   TYPE Capacite IS ARRAY (1..5) OF Integer;
+   TYPE Quantite IS ARRAY (1..5) OF Integer;
+   Type SymboleBat is array (1..5) of character;
+   TYPE Bateau IS RECORD
+      Nombat : Tbat:=(1=>"porte-avion       ",2=>"croiseur          ",3=>"contre-torpilleurs",4=>"torpilleur        ",5=>"sous-marin        "); 
+      Cap : Capacite:=(1=>5,2=>4,3=>3,4=>2,5=>1);
+      Qte : Quantite:=(1=>1,2=>2,3=>1,4=>1,5=>2);
+      symb : SymboleBat:=(1=>'1',2=>'2',3=>'3',4=>'4',5=>'5');
+
+   END RECORD;
+   
+   
+   
+   
+   
+   TYPE Tcarte IS ARRAY (1..10,1..10) OF Character;
+   
+   
+
+   PROCEDURE AffCarte ( Carte : IN OUT Tcarte ) IS
+      --pré-requis: aucun
+      --actions: affiche la carte où a lieu la bataille navale
+      --stratégie: parcours total de la matrice Carte
+      --variables:
+      
+      n : integer:=0;
+      
+   BEGIN
+      New_Line;
+      new_line;
+      New_Line;
+      New_Line;
+      for w in 1..30 loop
+            Put(" ");
+      END LOOP;
+      FOR N IN 1..10 LOOP
+         Put(N,1);
+         Put(" ");
+      END LOOP;
+      New_Line;
+      new_line;
+      for w in 1..26 loop
+            Put(" ");
+      END LOOP;
+      N:=1;
+      Put(N,1);
+      put("   ");
+      FOR I IN 1..10 LOOP
+         FOR J IN 1..10 LOOP
+            if (j/=10) then
+               Put(Carte(I,J));
+               put("|");
+            ELSE 
+               Put(Carte(I,J));
+            END IF;
+         END LOOP;
+         New_Line;
+         for l in 1..30 loop
+            Put(" ");
+         END LOOP;
+         if i/=10 then
+            FOR K IN 1..19 LOOP
+               Put("-");
+            END LOOP;
+         END IF;
+            
+         New_Line;
+         FOR M IN 1..26 LOOP
+            Put(" ");
+         END LOOP;
+         N:=N+1;
+         if n<10 then
+            Put(N,1);
+            Put("   ");
+         ELSif n=10 then
+            Put(N,1);
+            put("  ");
+         END IF;
+            
+      END LOOP;
+   END;   
+
+
+
+    PROCEDURE AffichageCaractBat ( Bat : IN OUT Bateau ) IS
+      --pré-requis: aucun
+      --actions: affiche les caractéristiques des bateaux utilisés dans la bataille navale
+      --stratégie: parcours totale du tableaau d'enregistrement
+      --variables:
+      
+      
+      
+   BEGIN
+      Put("  Nom du bateau");
+      Put("             ");
+      Put("Capacite");
+      Put("         ");
+      Put("Quantite");
+      put("         ");
+      put("Symbole");
+      New_Line;
+      New_Line;
+      FOR I IN 1..5 LOOP
+         Put("- ");
+         Put(Bat.Nombat(I));
+         Put(" ");
+         Put(Bat.Cap(I));
+         Put("      ");
+         Put(Bat.Qte(I));
+         Put("                ");
+         put(Bat.Symb(i));
+         New_Line;  
+                
+      END LOOP;
+   END;
+   
+
+
+   
+   FUNCTION CarteOrdi ( CarteIA : IN Tcarte ; Bat : in Bateau) RETURN Tcarte IS
+      --pré-requis: aucun
+      --resultat: retourne la carte de l'intelligence artificiel
+      --stratégie: parcours total de Bat et partiel sur CarteIA
+      --variables:
+      
+      SUBTYPE Ens1 IS Integer RANGE 1..10;
+      PACKAGE Coordonnées IS NEW Ada.Numerics.Discrete_Random (Ens1);   
+      USE Coordonnées;
+      G : Generator;
+      BienPlace : Boolean:=False;
+      i,X,Y,Mode,Cpt,J : Integer:=0;
+      CarteIA2 : Tcarte:=CarteIA;
+      Bat2 : Bateau:=Bat;
+      
+      
+      
+   BEGIN
+
+      Reset(G);
+      i:=1;
+      while (i<=5) loop
+         WHILE (BienPlace=False) LOOP
+            X:=Random(G);
+            Y:=Random(G);
+            while (mode/=1 and mode/=2) loop -- mode 1 = vertical , mode 2 = horizontal .
+               Mode:=Random(G);
+            END LOOP;
+            IF (Mode=1 AND CarteIA2(X,Y)='O') THEN
+               IF (X+Bat.Cap(I)<=10) THEN
+                  Cpt:=0;
+                  J:=x;
+                  WHILE (J<x+Bat.Cap(I) AND CarteIA2(J,Y)='O') LOOP
+                     Cpt:=Cpt+1;
+                     j:=j+1;
+                  END LOOP;
+                  IF (Cpt=Bat.Cap(I)) THEN
+                     FOR J IN X..X+Bat.Cap(I)-1 LOOP
+                        CarteIA2(J,Y):=Bat.Symb(I);
+                     END LOOP;
+                     BienPlace:=True;
+                     Bat2.Qte(i):=Bat2.Qte(i)-1;
+                  END IF;
+               END IF;
+            ELSIF (Mode=2 AND CarteIA2(X,Y)='O') THEN
+               IF (Y+Bat.Cap(I)<=10) THEN
+                  Cpt:=0;
+                  J:=Y;
+                  WHILE (J<Y+Bat.Cap(I) AND CarteIA2(X,J)='O') LOOP
+                     Cpt:=Cpt+1;
+                     j:=j+1;
+                  END LOOP;
+                  IF (Cpt=Bat.Cap(I)) THEN
+                     FOR J IN Y..Y+Bat.Cap(I)-1 LOOP
+                        CarteIA2(X,J):=Bat.Symb(I);
+                     END LOOP;
+                     BienPlace:=True;
+                     Bat2.Qte(i):=Bat2.Qte(i)-1;
+                  END IF;
+               END IF;
+            END IF;
+            mode:=0;
+         END LOOP;
+         BienPlace:=False;
+         IF Bat2.Qte(I)=0 THEN
+            I:=I+1;
+         END IF;
+      END LOOP;
+      RETURN CarteIA2;
+      
+   END;
+   
+
+
+   
+   PROCEDURE CarteJoueur (CarteJoueur : IN OUT Tcarte ; Bat : IN Bateau) IS
+      --pré-requis: aucun
+      --actions: construction de la carte navale du joueur par lui meme
+      --stratégie: aucune
+      --variables:
+      
+      
+
+      PROCEDURE AffichageCaractBat ( Bat : IN OUT Bateau ) IS
+      --pré-requis: aucun
+      --actions: affiche les caractéristiques des bateaux utilisés dans la bataille navale
+      --stratégie: parcours totale du tableaau d'enregistrement
+      --variables:
+      
+      
+      
+   BEGIN
+      Put("  Nom du bateau");
+      Put("             ");
+      Put("Capacite");
+      Put("         ");
+      Put("Quantite");
+      put("         ");
+      put("Symbole");
+      New_Line;
+      New_Line;
+      FOR I IN 1..5 LOOP
+         Put("- ");
+         Put(Bat.Nombat(I));
+         Put(" ");
+         Put(Bat.Cap(I));
+         Put("      ");
+         Put(Bat.Qte(I));
+         Put("                ");
+         put(Bat.Symb(i));
+         New_Line;  
+                
+      END LOOP;
+   END;
+   
+  PROCEDURE AffCarte ( Carte : IN OUT Tcarte ) IS
+      --pré-requis: aucun
+      --actions: affiche la carte où a lieu la bataille navale
+      --stratégie: parcours total de la matrice Carte
+      --variables:
+      
+      n : integer:=0;
+      
+   BEGIN
+      New_Line;
+      new_line;
+      New_Line;
+      New_Line;
+      for w in 1..30 loop
+            Put(" ");
+      END LOOP;
+      FOR N IN 1..10 LOOP
+         Put(N,1);
+         Put(" ");
+      END LOOP;
+      New_Line;
+      new_line;
+      for w in 1..26 loop
+            Put(" ");
+      END LOOP;
+      N:=1;
+      Put(N,1);
+      put("   ");
+      FOR I IN 1..10 LOOP
+         FOR J IN 1..10 LOOP
+            if (j/=10) then
+               Put(Carte(I,J));
+               put("|");
+            ELSE 
+               Put(Carte(I,J));
+            END IF;
+         END LOOP;
+         New_Line;
+         for l in 1..30 loop
+            Put(" ");
+         END LOOP;
+         if i/=10 then
+            FOR K IN 1..19 LOOP
+               Put("-");
+            END LOOP;
+         END IF;
+            
+         New_Line;
+         FOR M IN 1..26 LOOP
+            Put(" ");
+         END LOOP;
+         N:=N+1;
+         if n<10 then
+            Put(N,1);
+            Put("   ");
+         ELSif n=10 then
+            Put(N,1);
+            put("  ");
+         END IF;
+            
+      END LOOP;
+   END;   
+
+
+
+
+   Bat2 : Bateau:=Bat;
+   I,j,x,y,cpt : Integer:=0;
+   Rep : Character;
+   Place,Vertical,Horizontal : Boolean:=False;
+
+      
+      
+   BEGIN
+      FOR A IN 1..7 LOOP
+         New_Line;
+         New_Line;
+         New_Line;
+         Put_Line("   Caracteristiques de votre effectif : ");
+         New_Line;
+         New_Line;
+         AffichageCaractBat(Bat2);
+         New_Line;
+         New_Line;
+         Put_Line("   Quel bateau choisissez-vous de placer en premier ?");
+         Put_Line("    - taper 1 pour le porte-avion ");
+         Put_Line("    - taper 2 pour le croiseur ");
+         Put_Line("    - taper 3 pour le contre-torpilleur ");
+         Put_Line("    - taper 4 pour le torpilleur ");
+         Put_Line("    - taper 5 pour le sous-marin ");
+         New_Line;
+         Put("   votre choix : ");
+         Get(I);
+         WHILE (I/=1 AND I/=2 AND I/=3 AND I/=4 AND I/=5) LOOP
+            put("   Erreur ! Veuillez recommencer : ");
+            Get(I);
+         END LOOP;
+         new_line;
+         WHILE (Bat2.Qte(I)=0) LOOP
+            Put("   Vous ne pouvez pas utiliser ce bateau car il n'est plus en reserve, veuillez recommencer : ");
+            Get(I);
+         END LOOP;
+         New_Line;
+         Put("   Voici votre Carte :");
+         New_Line;
+         AffCarte(CarteJoueur);
+         New_Line;
+         New_Line;
+         New_Line;
+         
+         WHILE (Place=False) LOOP
+            put_line("   Tapez des coordonnees (comprises entre 1 et 10 ) afin de placer la premier partie du bateau : ");
+            Put("    - X : ");
+            Get(X);
+            New_Line;
+            Put("    - Y : ");
+            Get(Y);
+         
+            IF (X<=10 AND Y<=10 AND CarteJoueur(X,Y)='O' AND I=5) THEN --cas particulier
+               CarteJoueur(X,Y):=Bat2.Symb(I);
+               Place:=True;
+            elsIF (X+Bat2.Cap(I)<=10 AND Y+Bat2.Cap(I)<=10 AND CarteJoueur(X,Y)='O') THEN 
+               New_Line;
+               J:=X;
+               Cpt:=0;  
+               WHILE (J<X+Bat2.Cap(I) AND CarteJoueur(J,Y)='O') LOOP
+                  Cpt:=Cpt+1;
+                  J:=J+1;
+               END LOOP;
+               IF (Cpt=Bat2.Cap(I)) THEN
+                  Vertical:=True;
+               END IF;
+               J:=Y;
+               cpt:=0;
+               WHILE (J<Y+Bat2.Cap(I) AND CarteJoueur(X,J)='O') LOOP
+                  Cpt:=Cpt+1;
+                  J:=J+1;
+               END LOOP;
+               IF (Cpt=Bat2.Cap(I)) THEN
+                  Horizontal:=True;
+               END IF;
+               IF (Vertical=False AND Horizontal=True) THEN
+                  new_line;
+                  Put("   Vous pouvez placer le bateau horizontalement, voulez-vous le placer dans cette position ? ( o pour oui, n pour non ) ");
+                  New_Line;
+                  Get(Rep);
+                  IF (Rep='o') THEN
+                     FOR J IN Y..Y+Bat2.Cap(I)-1 LOOP
+                        CarteJoueur(X,J):=Bat2.Symb(I);
+                     END LOOP;
+                     Place:=True;
+                  ELSE
+                     Horizontal:=False;
+                     Vertical:=False;
+                  END IF;               
+               ELSIF (Vertical=True AND Horizontal=False) THEN
+                  new_line;
+                  Put("   Vous pouvez placer le bateau verticalement, voulez-vous le placer dans cette position ? ( o pour oui, n pour non ) ");
+                  New_Line;
+                  Get(Rep);
+                  IF (Rep='o') THEN
+                     FOR J IN X..X+Bat2.Cap(I)-1 LOOP
+                        CarteJoueur(J,Y):=Bat2.Symb(I);
+                     END LOOP;
+                     Place:=True;
+                  ELSE
+                     Horizontal:=False;
+                     Vertical:=False;
+                  END IF;
+               ELSIF (Vertical=True AND Horizontal=true) THEN
+                  new_line;
+                  Put_line("   Vous pouvez placer le bateau soit verticalement, soit horizontalement.");
+                  put("   Que souhaitez-vous ? (v pour vertical, h pour horizontal, n pour choisir d'autre coordonnées) ");
+                  New_Line;
+                  Get(Rep);
+                  IF (Rep='v') THEN
+                     FOR J IN X..X+Bat2.Cap(I)-1 LOOP
+                        CarteJoueur(J,Y):=Bat2.Symb(I);
+                     END LOOP;
+                     Place:=True;
+                  ELSIF (Rep='h') THEN
+                     FOR J IN Y..Y+Bat2.Cap(I)-1 LOOP
+                        CarteJoueur(X,J):=Bat2.Symb(I);
+                     END LOOP;
+                     Place:=True;
+                  ELSE
+                     Horizontal:=False;
+                     Vertical:=False;
+                  END IF;
+               ELSE
+                  New_Line;
+                  put_line("   Impossible de placer le bateau, veuillez ressaissir de nouvelles coordonnees :");                  
+                  new_line;
+               END IF;
+            ELSIF (X+Bat2.Cap(I)<=10 AND Y+Bat2.Cap(I)>10 AND CarteJoueur(X,Y)='O') THEN 
+               New_Line;
+               J:=X;
+               Cpt:=0;  
+               WHILE (J<X+Bat2.Cap(I) AND CarteJoueur(J,Y)='O') LOOP
+                  Cpt:=Cpt+1;
+                  J:=J+1;
+               END LOOP;
+               IF (Cpt=Bat2.Cap(I)) THEN
+                  Vertical:=True;
+               END IF;
+               IF (Vertical=True) THEN
+                  Put("   Vous pouvez placer le bateau verticalement, voulez-vous le placer dans cette position ? ( o pour oui, n pour non ) ");
+                  New_Line;
+                  Get(Rep);
+                  IF (Rep='o') THEN
+                     FOR J IN X..X+Bat2.Cap(I)-1 LOOP
+                        CarteJoueur(J,Y):=Bat2.Symb(I);
+                     END LOOP;
+                     Place:=True;
+                  ELSE
+                     Horizontal:=False;
+                     Vertical:=False;
+                  END IF;
+               ELSE
+                  Vertical:=False;
+               END IF;
+            ELSIF (X+Bat2.Cap(I)>10 AND Y+Bat2.Cap(I)<=10 AND CarteJoueur(X,Y)='O') THEN 
+                J:=Y;
+               cpt:=0;
+               WHILE (J<Y+Bat2.Cap(I) AND CarteJoueur(X,J)='O') LOOP
+                  Cpt:=Cpt+1;
+                  J:=J+1;
+               END LOOP;
+               IF (Cpt=Bat2.Cap(I)) THEN
+                  Horizontal:=True;
+               END IF;
+               IF (Horizontal=True) THEN
+                   new_line;
+                  Put("   Vous pouvez placer le bateau horizontalement, voulez-vous le placer dans cette position ? ( o pour oui, n pour non ) ");
+                  New_Line;
+                  Get(Rep);
+                  IF (Rep='o') THEN
+                     FOR J IN Y..Y+Bat2.Cap(I)-1 LOOP
+                        CarteJoueur(X,J):=Bat2.Symb(I);
+                     END LOOP;
+                     Place:=True;
+                  ELSE
+                     Horizontal:=False;
+                     Vertical:=False;
+                  END IF;    
+               ELSE
+                  Horizontal:=False;
+               END IF;            
+            ELSE
+               new_line;
+               put_line("impossible de placer le bateau, veuillez ressaissir de nouvelles coordonnees :");
+               new_line;
+            END IF;
+         END LOOP;
+         IF (Place=True) THEN
+            Bat2.Qte(I):=Bat2.Qte(I)-1;
+            New_Line;
+            New_Line;
+            Put("   Votre bateau est placé");
+            New_Line;
+            New_Line;
+         END IF;
+         Place:=False;
+         Horizontal:=False;
+         Vertical:=False;
+      END LOOP;
+   END;
+   
+            
+   PROCEDURE CoordonneesOrdi ( X : IN OUT Integer ; Y : IN OUT Integer ; Carte : IN Tcarte ) IS
+      --pré-requis: 0<x<11 and 0<y<11
+      --actions: si un bateau est touché avec les coordonnés X et Y alors l'ordinateur essaye de chercher les coordonnées des autres parties du bateaux 
+      --afin de le detruire 
+      --stratégie: aucune
+      --variables:
+      
+      Cpt : Integer:=0;
+      
+   BEGIN
+      IF (X+1<=10) THEN
+         IF (Carte(X+1,Y)/='O') THEN
+            X:=X+1;
+            Cpt:=Cpt+1;
+         END IF;
+      END IF;
+      IF (X-1>0 and cpt<1) THEN
+         IF (Carte(X-1,Y)/='O') THEN
+            X:=X-1;
+            Cpt:=Cpt+1;
+         END IF;
+      END IF;
+      IF (Y+1>0 and cpt<1) THEN
+         IF (Carte(X,Y+1)/='O') THEN
+            Y:=Y+1;
+            Cpt:=Cpt+1;
+         END IF;
+      END IF;
+      IF (Y-1>0 and cpt<1) THEN
+         IF (Carte(X,Y-1)/='O') THEN
+            Y:=Y-1;
+            Cpt:=Cpt+1;
+         END IF;
+      END IF;
+   END;
+   
+   PROCEDURE AffCarteAnnexe ( CarteAnnexe : Tcarte ) IS
+      --pré-requis: aucun
+      --actions: affiche la carte de l'adversaire
+      --stratégie: parcours total de Carte Annexe
+      --variables:
+      
+   BEGIN
+      New_Line;
+      New_Line;
+      New_Line;
+      Put("Carte de l'ordinateur : ");
+      New_Line;
+      New_Line;
+      FOR I IN 1..CarteAnnexe'Last LOOP
+         put("         ");
+         FOR J IN 1..CarteAnnexe'Last LOOP
+            Put(CarteAnnexe(I,J));
+         END LOOP;
+         New_Line;
+      END LOOP;
+   END ;
+   
+   PROCEDURE Temporisation IS
+      --pré-requis: aucun
+      --actions: création d'une temporisation
+      --stratégie: aucune
+      --variables:
+   
+
+      J,K,L,M : Integer:=0;
+    
+   BEGIN
+      
+      FOR I IN 1..3 LOOP
+         WHILE J<100000000 LOOP
+            WHILE k<100000000 LOOP
+               WHILE l<10000000 LOOP
+                  WHILE m<10000000 LOOP
+                     m:=m+1;
+                  END LOOP;
+                  L:=L+1;
+               END LOOP;
+               K:=K+1;
+            END LOOP;
+            J:=J+1;
+         END LOOP;
+         Put(" .");
+         J:=0;
+         K:=0;
+         L:=0;
+         M:=0;
+      END LOOP;
+   END;
+   
+
+   procedure MarqueTir (X : IN out Integer; Y : IN out Integer; Carte : IN out Tcarte ) IS
+      --pré-requis: 1<=x<=10 et 1<=y<=10 
+      --actions: retourne Carte modifié par le tir correspondant aux coordonnées x et y
+      --stratégie: aucune
+      --variables:
+      
+   BEGIN
+      IF ((X>0 AND Y>0) AND (X<11 AND Y<11)) THEN
+         IF (Carte2(X,Y)='O') THEN
+            Carte2(X,Y):='X';
+            New_Line;
+            New_Line;
+            Put("   Cible manque !");
+            New_Line;
+            New_Line;
+         IF (Carte2(X,Y)='X' or Carte2(X,Y)='T') THEN
+            Put_Line("   Zone deja touche ! Resaisissez de nouvelles coordonnees : ");
+            Put("      -X : ");
+            Get(X);
+            New_Line;
+            Put("      -Y : ");
+            Get(Y);
+            
+         
+
+                  
+
+
+
+
+   Bat : Bateau;
+   CarteIA,CartePlayer : Tcarte:=(OTHERS=>(OTHERS=>'O'));
+   CarteAnnexIA : Tcarte:=(OTHERS=>(OTHERS=>'O'));
+   SUBTYPE Ens2 IS Integer RANGE 1..10;
+   PACKAGE QuiCommence IS NEW Ada.Numerics.Discrete_Random (Ens2);   
+   USE QuiCommence;
+   G : Generator;
+   A,B,X,Y,Choix,cpt1,cpt2 : Integer:=0;
+   
+   
+
+   
+BEGIN
+   Put_Line("                     ======== Bataille Navale ======== ");
+   New_Line;
+   New_Line;
+   New_Line;
+   Put("   Construction de la carte IA ");
+   Temporisation;
+   CarteIA:=CarteOrdi(CarteIA,Bat);
+   New_Line;
+   New_Line;
+   New_Line;
+   Put("   Construction de la carte Joueur ");
+   CarteJoueur(CartePlayer,Bat);
+   Reset(G);
+   Choix:=Random(G);
+   WHILE Choix/=1 AND Choix/=2 LOOP
+      Choix:=Random(G);
+   END LOOP;
+   New_Line;
+   New_Line;
+   IF Choix=1 THEN
+      Put("le joueur commence !");
+   ELSE 
+      Put("L'ordinateur commence !");
+   END IF;
+    X:=Random(G);
+    Y:=Random(G);
+   IF Choix=1 THEN 
+      WHILE (Cpt1<20 AND Cpt2<20) LOOP
+         New_Line;
+         New_Line;
+         put("   tour Joueur : ");
+         New_Line; 
+         New_Line;
+         Put("   Voici votre carte :");
+         New_Line;
+         New_Line;
+         New_Line;
+         AffCarte(CartePlayer);
+         New_Line;
+         New_Line;
+         AffCarteAnnexe(CarteAnnexIA);
+         New_Line;
+         New_Line;
+         New_Line;
+         Put_Line("   Saisir des coordonnés (comprises entre 0 et 10 ) afin de toucher un bateau : ");
+         Put("      -X : ");
+         Get(A);
+         New_Line;
+         Put("      -Y : ");
+         Get(B);
+         WHILE ((A<1 AND B<1) AND (A>10 AND B>10)) LOOP
+            Put_Line("   Erreur ! Resaisissez de nouvelles coordonnees : ");
+            Put("      -X : ");
+            Get(A);
+            New_Line;
+            Put("      -Y : ");
+            Get(B);
+         END LOOP;
+         WHILE (CarteIA(A,B)='X' OR CarteIA(A,B)='T') LOOP
+            Put_Line("   Zone deja touche ! Resaisissez de nouvelles coordonnees : ");
+            Put("      -X : ");
+            Get(A);
+            New_Line;
+            Put("      -Y : ");
+            Get(B);
+         END LOOP;            
+         IF (CarteIA(A,B)='O') THEN
+            CarteIA(A,B):='X';
+            CarteAnnexIA(A,B):='X';
+            New_Line;
+            New_Line;
+            Put("   Cible manque !");
+            New_Line;
+            New_Line;
+         ELSE 
+            CarteIA(A,B):='T';
+            CarteAnnexIA(A,B):='T';
+            New_Line;
+            New_Line;
+            Put("   Cible touche !!");
+            cpt1:=cpt1+1;
+            New_Line;
+            New_Line;
+         END IF;
+         IF Cpt1<20 THEN
+            New_Line;
+            Put("   tour Ordinateur : ");
+            IF CarteJoueur(X,Y)='O' THEN
+               CarteJoueur(X,Y):='X';
+            ELSE
+               CarteJoueur(X,Y):='T';
+            END IF;
+            IF CarteJoueur(X,Y)='X' THEN
+               X:=Random(G);
+               Y:=Random(G);
+               while CarteJoueur(X,Y)='X' or  CarteJoueur(X,Y)='T'
+            
+
+
+               
+               
+               
+                  
+               
+            
+         END IF;
+                     
+            
+               
+            
+         
+
+            
+
+         
+
+            
+         
+
+         
+   
+         
+         
+
+      
+      
+   
+   
+  
+   AffCarte(CartePlayer);
+   AffCarteAnnexe(CarteAnnexIA);
+  
+   
+   
+   
+END ;
+
+   
+
+   
+
